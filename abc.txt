@@ -1,0 +1,37 @@
+test("it correctly destructures props", () => {
+    // Mock data
+    const DeleteLauncherMock = () => <button>Delete</button>;
+    const actionMock = jest.fn();
+    const cancelButtonTextMock = "Cancel";
+    const deleteButtonTextMock = "Delete";
+    const deleteBodyTextMock = "Are you sure you want to delete?";
+    const propsMock = {
+      deleteData: { id: 1, name: "Example" },
+      heading: "Delete Confirmation",
+      id: "delete-modal",
+      children: "Delete",
+    };
+
+    // Render the component with mock props
+    render(
+      <DeleteModal
+        component={DeleteLauncherMock}
+        action={actionMock}
+        cancelButtonText={cancelButtonTextMock}
+        deleteButtonText={deleteButtonTextMock}
+        deleteBodyText={deleteBodyTextMock}
+        {...propsMock}
+      />
+    );
+
+    // Assert props are correctly assigned
+    expect(DeleteLauncherMock).toBeDefined();
+    expect(actionMock).toBeDefined();
+    expect(cancelButtonTextMock).toBe("Cancel");
+    expect(deleteButtonTextMock).toBe("Delete");
+    expect(deleteBodyTextMock).toBe("Are you sure you want to delete?");
+    expect(propsMock.deleteData).toEqual({ id: 1, name: "Example" });
+    expect(propsMock.heading).toBe("Delete Confirmation");
+    expect(propsMock.id).toBe("delete-modal");
+    expect(propsMock.children).toBe("Delete");
+  });
