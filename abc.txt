@@ -1,6 +1,14 @@
-test("it correctly destructures props", () => {
+import React from "react";
+import { render, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom/extend-expect"; // Import for additional matchers
+import DeleteModal from "./DeleteModal";
+
+describe("DeleteModal component", () => {
+  test("it renders the component and handles delete action", () => {
     // Mock data
-    const DeleteLauncherMock = () => <button>Delete</button>;
+    const DeleteLauncherMock = ({ children, onClick }) => (
+      <button onClick={onClick}>{children}</button>
+    );
     const actionMock = jest.fn();
     const cancelButtonTextMock = "Cancel";
     const deleteButtonTextMock = "Delete";
@@ -13,7 +21,7 @@ test("it correctly destructures props", () => {
     };
 
     // Render the component with mock props
-    render(
+    const { getByText, getByTestId, queryByText } = render(
       <DeleteModal
         component={DeleteLauncherMock}
         action={actionMock}
@@ -24,14 +32,35 @@ test("it correctly destructures props", () => {
       />
     );
 
-    // Assert props are correctly assigned
-    expect(DeleteLauncherMock).toBeDefined();
-    expect(actionMock).toBeDefined();
-    expect(cancelButtonTextMock).toBe("Cancel");
-    expect(deleteButtonTextMock).toBe("Delete");
-    expect(deleteBodyTextMock).toBe("Are you sure you want to delete?");
-    expect(propsMock.deleteData).toEqual({ id: 1, name: "Example" });
-    expect(propsMock.heading).toBe("Delete Confirmation");
-    expect(propsMock.id).toBe("delete-modal");
-    expect(propsMock.children).toBe("Delete");
+    // Assert that the DeleteLauncher component is rendered
+    const deleteLauncherButton = getByText("Delete");
+    expect(deleteLauncherButton).toBeInTheDocument();
+
+    // Click on the DeleteLauncher to show the modal
+    fireEvent.click(deleteLauncherButton);
+
+    // Assert that the modal is shown
+    const modalHeading = getByTestId("modal-heading");
+    expect(modalHeading).toHaveTextContent("Delete Confirmation");
+
+    // Assert that the modal body contains the correct deleteBodyText
+    const modalBody = getByText("Are you sure you want to delete?");
+    expect(modalBody).toBeInTheDocument();
+
+    // Assert that the cancel and delete buttons are present in the modal
+    const cancelButton = getByText("Cancel");
+    expect(cancelButton).toBeInTheDocument();
+
+    const deleteButton = getByText("Delete");
+    expect(deleteButton).toBeInTheDocument();
+
+    // Click on the delete button to trigger the handleDelete function
+    fireEvent.click(deleteButton);
+
+    // Assert that the action function is called with the correct deleteData
+    expect(actionMock).toHaveBeenCalledWith({ id: 1, name: "Example" });
+
+    // Assert that the modal is closed
+    expect(queryByText("Delete Confirmation")).toBeNull();
   });
+});
